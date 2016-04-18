@@ -3,7 +3,7 @@
 import struct
 import types
 import gzip
-import os
+import MySQLdb
 
 class IfoFileException(Exception):
     """Exception while parsing the .ifo file.
@@ -357,6 +357,20 @@ def read_ifo_file(filename):
     for key in ifo_file._ifo:
         print key, " :", ifo_file._ifo[key]
 
+def feed_dictionary(from_language, to_language):
+    host = "40.74.112.135"
+    db_id = "dict_feeder"
+    db_pw = "slrtm97"
+    db_name = "mlll"
+
+    db = MySQLdb.connect(host, db_id, db_pw, db_name)
+    cursor = db.cursor()
+    cursor.execute("select version()")
+
+    data = cursor.fetchone()
+    print data
+
+    db.close()
 
 def read_dict_info():
     """
@@ -366,7 +380,7 @@ def read_dict_info():
 # read_ifo_file("stardict-cedict-gb-2.4.2/cedict-gb.ifo")
 # read_idx_file("stardict-cedict-gb-2.4.2/cedict-gb.idx")
 if __name__ == '__main__' :
-    read_dict_info()
+    feed_dictionary(1, 2)
 
 ifo_file = "quick_english-korean.ifo"
 idx_file = "quick_english-korean.idx"
