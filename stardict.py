@@ -30,7 +30,7 @@ class IfoFileReader(object):
     The structure of the dictionary is shown below:
     {key, value}
     """
-    
+
     def __init__(self, filename):
         """Constructor from filename.
         
@@ -80,7 +80,8 @@ class IdxFileReader(object):
     The dictionary is indexed by word name, and the value is an integer or a list of integers pointing to
     the entry in the list.
     """
-    
+    _word_idx = dict()
+    _index_idx = list()
     def __init__(self, filename, compressed = False, index_offset_bits = 32):
         """
         
@@ -99,8 +100,7 @@ class IdxFileReader(object):
         self._offset = 0
         self._index = 0
         self._index_offset_bits = index_offset_bits
-        self._word_idx = dict()
-        self._index_idx = list()
+
         for word_str, word_data_offset, word_data_size, index in self:
             self._index_idx.append((word_str, word_data_offset, word_data_size))
             if word_str in self._word_idx:
@@ -364,23 +364,32 @@ def feed_dictionary(from_language, to_language):
     db_name = "mlll"
 
     db = MySQLdb.connect(host, db_id, db_pw, db_name)
+    db.autocommit(True)
     cursor = db.cursor()
-    cursor.execute("select version()")
-
-    data = cursor.fetchone()
-    print data
+    query = "select dict_id from dictionary where from_language_id = %d && to_language_id = %d"%(from_language, to_language)
+    cursor.execute(query)
+    dict_id = cursor.fetchone()
+    for i in idx_reader._index_idx:
+        try:
+            word_desc = dict_reader.get_dict_by_word(i[0])[0]['g']
+            word_str = i[0].replace("""\'""","""""")
+            if word_desc != False:
+                word_desc = word_desc.replace("""\'""", """""")
+                word_desc = word_desc[word_desc.find('</span>') + 8:]
+                query = '''Insert Into word (dict_id, word_str, word_desc, word_len) Values (%d, \'%s\', \'%s\', %d)'''%(dict_id[0], word_str, word_desc, len(i[0]))
+                cursor.execute(query)
+                print 'Inserted Word : %s'%word_str
+        except:
+            print("Error occurs")
 
     db.close()
 
 def read_dict_info():
-    """
-    """
-    print dict_reader.get_dict_by_word("fuck")
+    for i in idx_reader._index_idx:
+        print i[0]
 
-# read_ifo_file("stardict-cedict-gb-2.4.2/cedict-gb.ifo")
-# read_idx_file("stardict-cedict-gb-2.4.2/cedict-gb.idx")
-if __name__ == '__main__' :
-    feed_dictionary(1, 2)
+    ###entry = dict_reader.get_dict_by_word("love")
+    ###print entry
 
 ifo_file = "quick_english-korean.ifo"
 idx_file = "quick_english-korean.idx"
@@ -389,3 +398,7 @@ dict_file = "quick_english-korean.dict.dz"
 ifo_reader = IfoFileReader(ifo_file)
 idx_reader = IdxFileReader(idx_file)
 dict_reader = DictFileReader(dict_file, ifo_reader, idx_reader, True)
+
+if __name__ == '__main__' :
+    feed_dictionary(1, 2)
+    ###read_dict_info()
