@@ -1,5 +1,5 @@
 from flask import Flask, request
-import stardict
+from stardict import DictFileReader
 from dbmanager import DBManager
 
 app = Flask(__name__)
@@ -20,9 +20,6 @@ def dict():
     i = len(word_desc)
     if word_desc != False:
         return word_desc[i-1]['g']
-
-
-
 
 if __name__ == "__main__":
     app.run(debug=True)
