@@ -1,0 +1,26 @@
+<!doctype html>
+<title>Dictionary</title>
+<meta charset="UTF-8">
+<head>
+ <link rel="stylesheet" type="button/css" href="button.css">
+</head>
+
+<input id="search_word" name="search" type="text" value="" />
+<button id="search" type="submit" onclick="search_click();" >Search</button>
+
+<script>
+function search_click() {
+    var value = document.getElementById('search_word').value;
+	alert(value);
+}
+</script>
+
+<form action="/foo" method="post">
+    <button type="submit" value="Search" />
+</form>
+
+{% if  word_desc %}
+  <h2>{{ word_str }} : {{ word_desc }}!</h2>
+{% else %}
+  <h1>No word found!</h1>
+{% endif %}

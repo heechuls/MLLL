@@ -371,7 +371,7 @@ def feed_dictionary(from_language, to_language):
     dict_id = cursor.fetchone()
     for i in idx_reader._index_idx:
         try:
-            word_desc = dict_reader.get_dict_by_word(i[0])[0]['g']
+            word_desc = dict_reader.get_dict_by_word(i[0])[0]['h']
             word_str = i[0].replace("""\'""","""""")
             if word_desc != False:
                 word_desc = word_desc.replace("""\'""", """""")
@@ -385,20 +385,26 @@ def feed_dictionary(from_language, to_language):
     db.close()
 
 def read_dict_info():
-    for i in idx_reader._index_idx:
-        print i[0]
+    print dict_reader.get_dict_by_word("사랑")
+    ###for i in idx_reader._index_idx:
+        ###print i[0]
 
     ###entry = dict_reader.get_dict_by_word("love")
     ###print entry
 
-ifo_file = "quick_english-korean.ifo"
-idx_file = "quick_english-korean.idx"
-dict_file = "quick_english-korean.dict.dz"
+###ifo_file = "quick_english-korean.ifo"
+###idx_file = "quick_english-korean.idx"
+###dict_file = "quick_english-korean.dict.dz"
+
+ifo_file = "Babylon_Korean_English.ifo"
+idx_file = "Babylon_Korean_English.idx"
+dict_file = "Babylon_Korean_English.dict.dz"
+
 
 ifo_reader = IfoFileReader(ifo_file)
 idx_reader = IdxFileReader(idx_file)
 dict_reader = DictFileReader(dict_file, ifo_reader, idx_reader, True)
 
 if __name__ == '__main__' :
-    feed_dictionary(1, 2)
+    feed_dictionary(2, 1)
     ###read_dict_info()
