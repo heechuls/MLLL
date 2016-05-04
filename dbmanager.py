@@ -20,7 +20,7 @@ class DBManager(object):
 
     def get_wordid_by_word(self, word):
         query = "select word_id from word where word_str = '%s'" %word
-        print(query)
+        ##print(query)
         cursor = self.db.cursor()
         try:
            cursor.execute(query)
@@ -51,13 +51,24 @@ class DBManager(object):
         return ret_val[0]
 
     def insert_scraped_url(self, url, word_count):
-        query = "INSERT INTO scrap (scrap_url, no_of_scrap_words) VALUES( '%s', 1)" % (url, word_count)
-        cursor = self.db.cursor()
-        cursor.execute(query)
+        try:
+            query = "INSERT INTO scrap (scrap_url, no_of_scrap_words) VALUES( '%s', %d)" % (url, word_count)
+            cursor = self.db.cursor()
+            cursor.execute(query)
+            self.db.commit()
+        except MySQLdb.OperationalError:
+            self.db.commit()
+        finally:
+            self.db.commit()
 
     def rating_word_with_commit(self, word):
-        self.rating_word(word)
-        self.db.commit();
+        try:
+            self.rating_word(word)
+            self.db.commit()
+        except MySQLdb.OperationalError:
+            self.db.commit()
+        finally:
+            self.db.commit()
 
     def rating_word(self, word):
         word_id = self.get_wordid_by_word(word)
@@ -66,7 +77,14 @@ class DBManager(object):
             ###print query
             cursor = self.db.cursor()
             cursor.execute(query)
-            print('Word rated (%s)' % word)
+            print('Word rated (%s)') % word
+
+    def get_random_words(self, start_val, end_val, limit):
+        query = "SELECT word.word_str, word.word_desc, rating.rating_value FROM word inner join rating where rating.word_id = word.word_id and rating.rating_value > %d and rating.rating_value < %d ORDER BY RAND() LIMIT %d"%(start_val, end_val, limit)
+        cursor = self.db.cursor()
+        cursor.execute(query)
+        print cursor
+        return cursor
 
 dbm = DBManager()
 

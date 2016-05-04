@@ -7,6 +7,9 @@ import urlparse
 
 def rate_words(text):
     word_cnt = 0;
+    ##print text;
+    text = re.sub(r"[^A-Za-z\s]", "", text.strip())
+    ##print text;
     for word in text.split():
         word = word.replace("'","")
         dbmanager.dbm.rating_word_with_commit(word)
@@ -32,8 +35,8 @@ def scrap_words(url):
             dbmanager.dbm.insert_scraped_url(article.url, word_cnt)
         except newspaper.ArticleException as e:
             print(e)
-
-    return word_cnt
+    else:
+        print('Already Scraped : %s')%article.url
 
 # Basic e-mail regexp:
 # letter/number/dot/comma @ letter/number/dot/comma . letter/number
@@ -75,4 +78,4 @@ def crawl(url, maxlevel):
     ##result += email_re.findall(req.text)
     ##return result
 
-crawl('http://www.cnn.com/index.html', 100)
+crawl('http://www.msn.com/en-us/news/crime/%e2%80%98tragic-loss%e2%80%99-utah-stepfather-charged-after-18-month-old-drowns-in-bathtub/ar-BBsBFw9', 200)
